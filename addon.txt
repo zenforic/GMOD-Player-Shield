@@ -1,0 +1,10 @@
+"AddonInfo"
+{
+        "name"              "Player Shield"
+        "version"           "1.2a"
+        "author_name"       "zenforic"
+        "author_email"      ""
+        "info"              "A neutrality declaration system with spawn protection included."
+        "override"          "0"
+}
+
