@@ -1,7 +1,7 @@
 # Player Shield Mod
 > Version 1.2a
 
-Player Shield Mod is a server-side addon for GMod providing anti-greifing features.
+Player Shield Mod is a server-side addon for GMod providing anti-griefing features.
 
 **Features:**
 
