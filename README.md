@@ -19,3 +19,7 @@ Peace mode may be activated by sending `!shield` or `!neutral` in chat. While ac
 **Anti-Spawn Kill:**
 
 The spawn kill protection works similar to the "peace" mode, but rather than when they kill a player it is stripped when they harm a player.
+
+**To-do:**
+- Make cooldown time modifiable
+- Make peace mode disableable.
