@@ -158,8 +158,9 @@ local function Killed(Victim, Weapon, Killer)
 		end
 	end
 	if Killer:IsPlayer() and Killer:HasGodMode() then
-		CSay(nil, "DEBUG: not "..Killer:Nick().." == "..Victim:Nick().." returns "..tostring(not Killer == Victim), cyan)
-		if not Killer == Victim then
+		if Killer == Victim then
+			CSay(Victim, "You committed suicide.", red)
+		else
 			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
 			CSay(nil, msg, red)
 			Killer:GodDisable()
