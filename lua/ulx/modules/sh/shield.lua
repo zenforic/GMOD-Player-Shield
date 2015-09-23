@@ -140,7 +140,7 @@ removecooldown:addParam{ type=ULib.cmds.PlayerArg }
 removecooldown:help("Reset shield cooldown from the given player.")
 
 
----[[
+--[[
 function ulx.reducecooldown(Admin, Player, Time)
 	UpdateCooldownDB()
 	CSay(Player, "Your shield cooldown timer has been reduced.", red)
