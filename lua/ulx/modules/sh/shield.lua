@@ -28,10 +28,6 @@ local function SetCooldown(Player, Initialize)
 	end
 end
 
-local function SubCooldown(Player, Amount)
-	ShieldCooldownDB[Player:Nick()]=ShieldCooldownDB[Player:Nick()] - Amount
-end
-
 local function UpdateCooldownDB()
 	for _, v in pairs(player.GetAll()) do
 		if GetCooldown(v) == nil then
@@ -139,33 +135,14 @@ removecooldown:defaultAccess(ULib.ACCESS_SUPERADMIN)
 removecooldown:addParam{ type=ULib.cmds.PlayerArg }
 removecooldown:help("Reset shield cooldown from the given player.")
 
-
---[[
-function ulx.reducecooldown(Admin, Player, Time)
-	UpdateCooldownDB()
-	CSay(Player, "Your shield cooldown timer has been reduced.", red)
-	SubCooldown(Player, Time)
-end
-
-local reducecooldown = ulx.command(CATEGORY_NAME, "ulx reducecooldown", ulx.reducecooldown, "!reducecooldown")
-removecooldown:defaultAccess(ULib.ACCESS_SUPERADMIN)
-removecooldown:addParam{ type=ULib.cmds.PlayerArg }
-removecooldown:addParam{ type=ULib.cmds.IntegerArg } -- Double check before removing comment block
-removecooldown:help("Reduce shield cooldown from the given player by given seconds.")
-
-function ShieldMod.BuyReduction(Player, Time)
-	SubCooldown(Player, Time)
-end
---]]
-
 -- Legacy Commands
-local legacy_shield = ulx.command(CATEGORY_NAME, "ulx neutral", ulx.shield, "!neutral")
-legacy_shield:defaultAccess(ULib.ACCESS_ALL)
-legacy_shield:help("<LEGACY> Declare yourself as a neutral player. You may not attack or be attacked during neutrality.")
+local neutral = ulx.command(CATEGORY_NAME, "ulx neutral", ulx.shield, "!neutral")
+neutral:defaultAccess(ULib.ACCESS_ALL)
+neutral:help("<LEGACY> Declare yourself as a neutral player. You may not attack or be attacked during neutrality.")
 
-local legacy_list = ulx.command(CATEGORY_NAME, "ulx lsneutral", ulx.listshielded, "!lsneutral")
-legacy_list:defaultAccess(ULib.ACCESS_ALL)
-legacy_list:help("<LEGACY> List all players that are neutral.")
+local ls = ulx.command(CATEGORY_NAME, "ulx lsneutral", ulx.listshielded, "!lsneutral")
+ls:defaultAccess(ULib.ACCESS_ALL)
+ls:help("<LEGACY> List all players that are neutral.")
 
 -- Register for Events
 gameevent.Listen("PlayerDeath")
@@ -180,16 +157,13 @@ local function Killed(Victim, Weapon, Killer)
 			Killer=v
 		end
 	end
-	if Killer:IsPlayer() and Killer:HasGodMode() and not Killer:EntIndex() == Victim:EntIndex() then
-		local msg = Killer:Nick().."'s "
-		if SpawnProtectedDB[Killer:Nick()] then
-			msg = msg.."spawn protection has been revoked for killing "..Victim:Nick().." and may not activate a shield for 45 minutes."
-		else
-			msg = msg.."shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
+	if Killer:IsPlayer() and Killer:HasGodMode() then
+		if not Killer == Victim then
+			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
+			CSay(nil, msg, red)
+			Killer:GodDisable()
+			SetCooldown(Killer, false)
 		end
-		CSay(nil, msg, red)
-		Killer:GodDisable()
-		SetCooldown(Killer, false)
 	end
 end
 
