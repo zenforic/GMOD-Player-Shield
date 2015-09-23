@@ -155,7 +155,7 @@ removecooldown:help("Reduce shield cooldown from the given player by given secon
 --]--
 
 -- Shop Callback Functions
---[ function ShieldMod.BuyReduction(Player, Time)
+--[-- function ShieldMod.BuyReduction(Player, Time)
 	SubCooldown(Player, Time)
 end --]--
 
