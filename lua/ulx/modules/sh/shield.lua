@@ -140,7 +140,7 @@ removecooldown:addParam{ type=ULib.cmds.PlayerArg }
 removecooldown:help("Reset shield cooldown from the given player.")
 
 
---[       Not Implemented Yet
+--[--       Not Implemented Yet
 function ulx.reducecooldown(Admin, Player, Time)
 	UpdateCooldownDB()
 	CSay(Player, "Your shield cooldown timer has been reduced.", red)
@@ -152,7 +152,7 @@ removecooldown:defaultAccess(ULib.ACCESS_SUPERADMIN)
 removecooldown:addParam{ type=ULib.cmds.PlayerArg }
 removecooldown:addParam{ type=ULib.cmds.IntegerArg } -- Double check before removing comment block
 removecooldown:help("Reduce shield cooldown from the given player by given seconds.")
-]--
+--]--
 
 -- Shop Callback Functions
 function ShieldMod.BuyReduction(Player, Time)
