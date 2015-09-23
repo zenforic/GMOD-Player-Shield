@@ -12,6 +12,10 @@ local red = Color(255, 0, 0)
 local green = Color(0, 255, 0)
 
 -- Helper Functions
+local function CSay(t, m, c)
+	ULib.csay(t, m, c)
+end
+
 local function GetCooldown(Player)
 	return ShieldCooldownDB[Player:Nick()]
 end
@@ -42,10 +46,6 @@ local function ExpireProtection(Player)
 		Player:GodDisable()
 		CSay(Player, "Your protection has expired.", red)
 	end
-end
-
-local function CSay(t, m, c)
-	ULib.csay(t, m, c)
 end
 
 local function ActivateShield(Player)
