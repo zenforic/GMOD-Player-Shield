@@ -155,9 +155,9 @@ removecooldown:help("Reduce shield cooldown from the given player by given secon
 --]--
 
 -- Shop Callback Functions
-function ShieldMod.BuyReduction(Player, Time)
+--[ function ShieldMod.BuyReduction(Player, Time)
 	SubCooldown(Player, Time)
-end
+end --]--
 
 -- Legacy Commands
 local legacy_shield = ulx.command(CATEGORY_NAME, "ulx neutral", ulx.shield, "!neutral")
