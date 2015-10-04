@@ -124,6 +124,17 @@ disableshield:defaultAccess(ULib.ACCESS_SUPERADMIN)
 disableshield:addParam{ type=ULib.cmds.PlayerArg }
 disableshield:help("Revoke shield from the given player.")
 
+function ulx.forfeitshield(Player)
+	UpdateCooldownDB()
+	CSay(Player, "You have forfeited your shield and my not reactivate it for 45 minutes.", red)
+	SetCooldown(Player)
+	Player:GodDisable()
+end
+
+local forfeitshield = ulx.command(CATEGORY_NAME, "ulx forfeitshield", ulx.forfeitshield, "!forfeitshield")
+forfeitshield:defaultAccess(ULib.ACCESS_ALL)
+forfeitshield:help("Forfeits your shield.")
+
 function ulx.removecooldown(Admin, Player)
 	UpdateCooldownDB()
 	CSay(Player, "Your shield cooldown timer has been zeroed.", red)
