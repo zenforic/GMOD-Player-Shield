@@ -169,7 +169,7 @@ end
 
 local function Spawn(Player)
 	UpdateCooldownDB()
-	if Player:Deaths() > 0 then
+	if Player:Deaths() ~= 0 then
 		CSay(Player, "You are protected for 20 seconds or until you attack someone.", green)
 		SpawnProtectedDB[Player:Nick()]=true
 		Player:GodEnable()
