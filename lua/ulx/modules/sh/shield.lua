@@ -169,10 +169,17 @@ end
 
 local function Spawn(Player)
 	UpdateCooldownDB()
-	CSay(Player, "You are protected for 60 seconds or until you attack someone.", green)
-	SpawnProtectedDB[Player:Nick()]=true
-	Player:GodEnable()
-	timer.Simple(60, function() ExpireProtection(Player) end)
+	if Player:Deaths() ~= 0 then
+		CSay(Player, "You are protected for 20 seconds or until you attack someone.", green)
+		SpawnProtectedDB[Player:Nick()]=true
+		Player:GodEnable()
+		timer.Simple(20, function() ExpireProtection(Player) end)
+	else
+		CSay(Player, "You are protected for 2 minutes or until you attack someone.", green)
+		SpawnProtectedDB[Player:Nick()]=true
+		Player:GodEnable()
+		timer.Simple(120, function() ExpireProtection(Player) end)
+	end
 end
 
 local function Damaged(Victim, Attacker)
