@@ -5,6 +5,7 @@ Player Shield Mod is a server-side addon for GMod providing anti-griefing featur
 
 **Features:**
 
+- 120-second Initial spawn kill protection
 - 60-second Spawn kill protection
 - "Peace" mode
 
