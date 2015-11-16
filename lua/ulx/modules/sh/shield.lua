@@ -175,6 +175,13 @@ local function Killed(Victim, Weapon, Killer)
 			Killer:GodDisable()
 			SetCooldown(Killer, false)
 		end
+	elseif Killer:GetOwner():IsPlayer() and Killer:GetOwner():HasGodMode() then
+		if Killer ~= Victim then
+			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
+			CSay(nil, msg, red)
+			Killer:GodDisable()
+			SetCooldown(Killer, false)
+		end
 	end
 end
 
