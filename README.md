@@ -1,26 +1,36 @@
 # Player Shield Mod
-> Version 1.2a
+> Version 1.3a
 
 Player Shield Mod is a server-side addon for GMod providing anti-griefing features.
 
 **Features:**
 
-- 120-second Initial spawn kill protection
-- 60-second Spawn kill protection
+- 120-second default modifiable Initial spawn kill protection
+- 60-second default modifiable Spawn kill protection
 - "Peace" mode
 
 **Dependencies:**
 
-- Ulysses Mod
+- Ulysses Mod (ULX + ULib)
 
 **"Peace" Mode:**
 
-Peace mode may be activated by sending `!shield` or `!neutral` in chat. While activated, one is unable to be killed. If, however, they kill another player their shield will be removed and other players can kill them again with a 45 minute re-activation cooldown.
+Peace mode may be activated by sending `!shield` or `!neutral` in chat, disabled by typing `!forfeitshield` in chat. While activated, one is unable to be killed. If, however, they kill another player their shield will be removed and other players can kill them again with a 45 minute re-activation cooldown.
 
 **Anti-Spawn Kill:**
 
 The spawn kill protection works similar to the "peace" mode, but rather than when they kill a player it is stripped when they harm a player.
 
 **To-do:**
-- Make cooldown time modifiable
-- Make peace mode disableable.
+- Nothing Yet. Open to suggestions.
+
+**CVars:**
+- `sm_initcooldown int` - Initial spawn cooldown time in seconds.
+- `sm_cooltime int` - Cooldown for each loss of shield in minutes.
+- `sm_spawncooltime int` - Cooldown time for each subsequent spawn after the first, in seconds.
+
+**Admin Commands:**
+- `!disableshield player` - Revoke shield from the given player.
+- `!removecooldown player` - Reset shield cooldown from the given player.
+- `!resetcooldowntimers` - resets all cooldown timers.
+- `!resetshields` - Reset shield cooldown timers and revokes all shields.

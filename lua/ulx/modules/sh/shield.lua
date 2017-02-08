@@ -1,10 +1,11 @@
------[    Player Shield Mod Version 1.2a    ]-----
-
+-----[    Player Shield Mod Version 1.3a    ]-----
 -- Variables
 CATEGORY_NAME = "Shield"
 ShieldCooldownDB = {}
 SpawnProtectedDB = {}
-
+local InitialSpawnCooldownTime = GetConVar("sm_initcooltime")
+local SubsequentCooldownTime = GetConVar("sm_spawncooltime")
+local CooldownTime = GetConVar("sm_cooltime")
 -- Colors
 local yellow = Color(255, 255, 0)
 local cyan = Color(0, 255, 255)
@@ -17,14 +18,14 @@ local function CSay(t, m, c)
 end
 
 local function GetCooldown(Player)
-	return ShieldCooldownDB[Player:Nick()]
+	return ShieldCooldownDB[Player:SteamID64()]
 end
 
 local function SetCooldown(Player, Initialize)
 	if Initialize then
-		ShieldCooldownDB[Player:Nick()]=0
+		ShieldCooldownDB[Player:SteamID64()] = 0
 	else
-		ShieldCooldownDB[Player:Nick()]=os.time()
+		ShieldCooldownDB[Player:SteamID64()] = os.time()
 	end
 end
 
@@ -38,7 +39,7 @@ end
 
 local function ExpireProtection(Player)
 	if SpawnProtectedDB[Player:Nick()] then
-		SpawnProtectedDB[Player:Nick()]=false
+		SpawnProtectedDB[Player:Nick()] = false
 		Player:GodDisable()
 		CSay(Player, "Your protection has expired.", red)
 	end
@@ -46,173 +47,213 @@ end
 
 local function ActivateShield(Player)
 	UpdateCooldownDB()
-	local waittime = 45*60
+	local waittime = CooldownTime * 60
 	local diff = os.time() - GetCooldown(Player)
-	local dm = 45 - math.floor(diff / 60)
-	local msg = "You are currently on shield cooldown. You may declare shielded in "..dm.." minutes."
+	local dm = CooldownTime - math.floor(diff / 60)
+	local msg = "You are currently on shield cooldown. You may declare shielded in " .. dm .. " minutes."
 	local to = Player
+
 	if GetCooldown(Player) == 0 or diff >= waittime or GetCooldown(Player) == nil then
 		Player:GodEnable()
-		msg = Player:Nick().." has shielded, you cannot kill them unless they kill someone else!"
-		to = nil
-		SpawnProtectedDB[Player:Nick()]=false
+		msg = Player:Nick() .. " has shielded, you cannot kill them unless they kill someone else!"
+			to = nil
+			SpawnProtectedDB[Player:Nick()] = false
+		end
+
+		CSay(to, msg, yellow)
 	end
-	CSay(to, msg, yellow)
-end
 
--- ULX Commands
-function ulx.shield(Player)
-	UpdateCooldownDB()
-	ActivateShield(Player)
-end
+	-- ULX Commands
+	function ulx.shield(Player)
+		UpdateCooldownDB()
+		ActivateShield(Player)
+	end
 
-local shield = ulx.command(CATEGORY_NAME, "ulx shield", ulx.shield, "!shield")
-shield:defaultAccess(ULib.ACCESS_ALL)
-shield:help("Declare yourself as a shielded player. You may not attack or be attacked when shielded.")
+	local shield = ulx.command(CATEGORY_NAME, "ulx shield", ulx.shield, "!shield")
+	shield:defaultAccess(ULib.ACCESS_ALL)
+	shield:help("Declare yourself as a shielded player. You may not attack or be attacked when shielded.")
 
-function ulx.listshielded(Player)
-	UpdateCooldownDB()
-	local msg = "Shielded Players:"
-	for _, v in pairs(player.GetAll()) do
-		if v:HasGodMode() then
-			msg=msg.." "..tostring(v:Nick())..","
+	function ulx.listshielded(Player)
+		UpdateCooldownDB()
+		local msg = "Shielded Players:"
+
+		for _, v in pairs(player.GetAll()) do
+			if v:HasGodMode() then
+				msg = msg .. " " .. tostring(v:Nick()) .. ","
+			end
+		end
+
+		msg = string.sub(msg, 0, -2)
+		CSay(Player, msg, cyan)
+	end
+
+	local ls = ulx.command(CATEGORY_NAME, "ulx listshielded", ulx.listshielded, "!listshielded")
+	ls:defaultAccess(ULib.ACCESS_ALL)
+	ls:help("List all players that are shielded.")
+
+	function ulx.resetshields(Player)
+		UpdateCooldownDB()
+		CSay(nil, "All shield cooldown timers have been reset and shields have been revoked.", red)
+
+		for _, v in pairs(player.GetAll()) do
+			if v:HasGodMode() then
+				v:GodDisable()
+			end
+
+			SetCooldown(Player, true)
 		end
 	end
-	msg=string.sub(msg, 0, -2)
-	CSay(Player, msg, cyan)
-end
 
-local ls = ulx.command(CATEGORY_NAME, "ulx listshielded", ulx.listshielded, "!listshielded")
-ls:defaultAccess(ULib.ACCESS_ALL)
-ls:help("List all players that are shielded.")
+	local resetshields = ulx.command(CATEGORY_NAME, "ulx resetshields", ulx.resetshields, "!resetshields")
+	resetshields:defaultAccess(ULib.ACCESS_SUPERADMIN)
+	resetshields:help("Reset shield cooldown timers and revokes all shields.")
 
-function ulx.resetshields(Player)
-	UpdateCooldownDB()
-	CSay(nil, "All shield cooldown timers have been reset and shields have been revoked.", red)
-	for _, v in pairs(player.GetAll()) do
-		if v:HasGodMode() then
-			v:GodDisable()
+	function ulx.resetcooldowntimers(Player)
+		UpdateCooldownDB()
+		CSay(nil, "All shield cooldown timers have been reset.", red)
+
+		for _, v in pairs(player.GetAll()) do
+			SetCooldown(Player, true)
 		end
+	end
+
+	local resetcooldowntimers = ulx.command(CATEGORY_NAME, "ulx resetcooldowntimers", ulx.resetcooldowntimers, "!resetcooldowntimers")
+	resetcooldowntimers:defaultAccess(ULib.ACCESS_SUPERADMIN)
+	resetcooldowntimers:help("Reset shield cooldown timers.")
+
+	function ulx.disableshield(Admin, Player)
+		UpdateCooldownDB()
+		CSay(Player, "Your shield has been removed.", red)
+		Player:GodDisable()
+	end
+
+	function ulx.forfeitshield(Player)
+		UpdateCooldownDB()
+		CSay(Player, "You have forfeited your shield and my not reactivate it for " .. CooldownTime:GetString() .. " minutes.", red)
+		SetCooldown(Player)
+		Player:GodDisable()
+	end
+
+	local forfeitshield = ulx.command(CATEGORY_NAME, "ulx forfeitshield", ulx.forfeitshield, "!forfeitshield")
+	forfeitshield:defaultAccess(ULib.ACCESS_ALL)
+	forfeitshield:help("Forfeits your shield.")
+
+	function ulx.removecooldown(Admin, Player)
+		UpdateCooldownDB()
+		CSay(Player, "Your shield cooldown timer has been zeroed.", red)
 		SetCooldown(Player, true)
 	end
-end
 
-local resetshields = ulx.command(CATEGORY_NAME, "ulx resetshields", ulx.resetshields, "!resetshields")
-resetshields:defaultAccess(ULib.ACCESS_SUPERADMIN)
-resetshields:help("Reset shield cooldown timers and revokes all shields.")
+	local disableshield = ulx.command(CATEGORY_NAME, "ulx disableshield", ulx.disableshield, "!disableshield")
+	disableshield:defaultAccess(ULib.ACCESS_SUPERADMIN)
 
-function ulx.resetcooldowntimers(Player)
-	UpdateCooldownDB()
-	CSay(nil, "All shield cooldown timers have been reset.", red)
-	for _, v in pairs(player.GetAll()) do
+	disableshield:addParam{
+		type = ULib.cmds.PlayerArg
+	}
+
+	disableshield:help("Revoke shield from the given player.")
+
+	function ulx.removecooldown(Admin, Player)
+		UpdateCooldownDB()
+		CSay(Player, "Your shield cooldown timer has been zeroed.", red)
 		SetCooldown(Player, true)
 	end
-end
 
-local resetcooldowntimers = ulx.command(CATEGORY_NAME, "ulx resetcooldowntimers", ulx.resetcooldowntimers, "!resetcooldowntimers")
-resetcooldowntimers:defaultAccess(ULib.ACCESS_SUPERADMIN)
-resetcooldowntimers:help("Reset shield cooldown timers.")
+	local removecooldown = ulx.command(CATEGORY_NAME, "ulx removecooldown", ulx.removecooldown, "!removecooldown")
+	removecooldown:defaultAccess(ULib.ACCESS_SUPERADMIN)
 
-function ulx.disableshield(Admin, Player)
-	UpdateCooldownDB()
-	CSay(Player, "Your shield has been removed.", red)
-	Player:GodDisable()
-end
+	removecooldown:addParam{
+		type = ULib.cmds.PlayerArg
+	}
 
-local disableshield = ulx.command(CATEGORY_NAME, "ulx disableshield", ulx.disableshield, "!disableshield")
-disableshield:defaultAccess(ULib.ACCESS_SUPERADMIN)
-disableshield:addParam{ type=ULib.cmds.PlayerArg }
-disableshield:help("Revoke shield from the given player.")
+	removecooldown:help("Reset shield cooldown from the given player.")
+	-- Legacy Commands
+	local neutral = ulx.command(CATEGORY_NAME, "ulx neutral", ulx.shield, "!neutral")
+	neutral:defaultAccess(ULib.ACCESS_ALL)
+	neutral:help("<LEGACY> Declare yourself as a neutral player. You may not attack or be attacked during neutrality.")
+	local ls = ulx.command(CATEGORY_NAME, "ulx lsneutral", ulx.listshielded, "!lsneutral")
+	ls:defaultAccess(ULib.ACCESS_ALL)
+	ls:help("<LEGACY> List all players that are neutral.")
+	-- Register for Events
+	gameevent.Listen("PlayerDeath")
+	gameevent.Listen("PlayerSpawn")
+	gameevent.Listen("PlayerHurt")
 
-function ulx.forfeitshield(Player)
-	UpdateCooldownDB()
-	CSay(Player, "You have forfeited your shield and my not reactivate it for 45 minutes.", red)
-	SetCooldown(Player)
-	Player:GodDisable()
-end
+	-- Event Functions
+	local function Killed(Victim, Weapon, Killer)
+		UpdateCooldownDB()
 
-local forfeitshield = ulx.command(CATEGORY_NAME, "ulx forfeitshield", ulx.forfeitshield, "!forfeitshield")
-forfeitshield:defaultAccess(ULib.ACCESS_ALL)
-forfeitshield:help("Forfeits your shield.")
-
-function ulx.removecooldown(Admin, Player)
-	UpdateCooldownDB()
-	CSay(Player, "Your shield cooldown timer has been zeroed.", red)
-	SetCooldown(Player, true)
-end
-
-local removecooldown = ulx.command(CATEGORY_NAME, "ulx removecooldown", ulx.removecooldown, "!removecooldown")
-removecooldown:defaultAccess(ULib.ACCESS_SUPERADMIN)
-removecooldown:addParam{ type=ULib.cmds.PlayerArg }
-removecooldown:help("Reset shield cooldown from the given player.")
-
--- Legacy Commands
-local neutral = ulx.command(CATEGORY_NAME, "ulx neutral", ulx.shield, "!neutral")
-neutral:defaultAccess(ULib.ACCESS_ALL)
-neutral:help("<LEGACY> Declare yourself as a neutral player. You may not attack or be attacked during neutrality.")
-
-local ls = ulx.command(CATEGORY_NAME, "ulx lsneutral", ulx.listshielded, "!lsneutral")
-ls:defaultAccess(ULib.ACCESS_ALL)
-ls:help("<LEGACY> List all players that are neutral.")
-
--- Register for Events
-gameevent.Listen("PlayerDeath")
-gameevent.Listen("PlayerSpawn")
-gameevent.Listen("PlayerHurt")
-
--- Event Functions
-local function Killed(Victim, Weapon, Killer)
-	UpdateCooldownDB()
-	for _, v in pairs(player.GetAll()) do
-		if v:EntIndex() == Killer:EntIndex() then
-			Killer=v
+		for _, v in pairs(player.GetAll()) do
+			if v:EntIndex() == Killer:EntIndex() then
+				Killer = v
+			end
 		end
-	end
-	if Killer:IsPlayer() and Killer:HasGodMode() then
-		if Killer ~= Victim then
-			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
+
+		if Killer:IsPlayer() and Killer:HasGodMode() and Killer ~= Victim then
+			local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetString() .. " minutes."
 			CSay(nil, msg, red)
 			Killer:GodDisable()
 			SetCooldown(Killer, false)
-		end
-	elseif Killer:GetOwner():IsPlayer() and Killer:GetOwner():HasGodMode() then
-		if Killer ~= Victim then
-			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
-			CSay(nil, msg, red)
-			Killer:GodDisable()
-			SetCooldown(Killer, false)
-		end
-	end
-end
-
-local function Spawn(Player)
-	UpdateCooldownDB()
-	if Player:Deaths() ~= 0 then
-		CSay(Player, "You are protected for 20 seconds or until you attack someone.", green)
-		SpawnProtectedDB[Player:Nick()]=true
-		Player:GodEnable()
-		timer.Simple(20, function() ExpireProtection(Player) end)
-	else
-		CSay(Player, "You are protected for 2 minutes or until you attack someone.", green)
-		SpawnProtectedDB[Player:Nick()]=true
-		Player:GodEnable()
-		timer.Simple(120, function() ExpireProtection(Player) end)
-	end
-end
-
-local function Damaged(Victim, Attacker)
-	UpdateCooldownDB()
-	for _, v in pairs(player.GetAll()) do
-		if v:EntIndex() == Attacker:EntIndex() then
-			Attacker=v
+		elseif Killer:GetOwner():IsPlayer() and Killer:GetOwner():HasGodMode() then
+			if Killer ~= Victim then
+				local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetString() .. " minutes."
+				CSay(nil, msg, red)
+				Killer:GodDisable()
+				SetCooldown(Killer, false)
+			end
 		end
 	end
-	if Attacker:IsPlayer() and Attacker:HasGodMode() then
-		ExpireProtection(Attacker)
-	end
-end
 
--- Add Event Hook
-hook.Add("PlayerDeath", "ShieldMod_DEATH", Killed)
-hook.Add("PlayerSpawn", "ShieldMod_SPAWN", Spawn)
-hook.Add("PlayerHurt", "ShieldMod_HURT", Damaged)
+	local function Spawn(Player)
+		UpdateCooldownDB()
+
+		if Player:Deaths() ~= 0 then
+			CSay(Player, "You are protected for " .. SubsequentCooldownTime:GetString() .. " seconds or until you attack someone.", green)
+			SpawnProtectedDB[Player:Nick()] = true
+			Player:GodEnable()
+
+			timer.Simple(SubsequentCooldownTime, function()
+				ExpireProtection(Player)
+			end)
+		else
+			if InitialSpawnCooldownTime:GetInt() >= 60 then
+				local cotom = InitialSpawnCooldownTime:GetInt() / 60
+				CSay(Player, "You are protected for " .. cotom .. " minutes or until you attack someone.", green)
+			else
+				CSay(Player, "You are protected for " .. InitialSpawnCooldownTime:GetString() .. " seconds or until you attack someone.", green)
+			end
+
+			SpawnProtectedDB[Player:Nick()] = true
+			Player:GodEnable()
+
+			timer.Simple(InitialSpawnCooldownTime, function()
+				ExpireProtection(Player)
+			end)
+		end
+	end
+
+	local function Damaged(Victim, Attacker)
+		UpdateCooldownDB()
+
+		for _, v in pairs(player.GetAll()) do
+			if v:EntIndex() == Attacker:EntIndex() then
+				Attacker = v
+			end
+		end
+
+		if Attacker:IsPlayer() and Attacker:HasGodMode() then
+			ExpireProtection(Attacker)
+		end
+	end
+
+	-- Init Convars
+	if SERVER then
+		ulx.convar("sm_cooltime", "45", "Cooldown for each loss of shield in minutes", ULib.ACCESS_SUPERADMIN)
+		ulx.convar("sm_initcooltime", "120", "Initial spawn cooldown time in seconds", ULib.ACCESS_SUPERADMIN)
+		ulx.convar("sm_spawncooltime", "20", "Cooldown time for each subsequent spawn after the first, in seconds", ULib.ACCESS_SUPERADMIN)
+	end
+
+	-- Add Event Hook
+	hook.Add("PlayerDeath", "ShieldMod_DEATH", Killed)
+	hook.Add("PlayerSpawn", "ShieldMod_SPAWN", Spawn)
+	hook.Add("PlayerHurt", "ShieldMod_HURT", Damaged)
