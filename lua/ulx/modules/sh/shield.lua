@@ -122,11 +122,30 @@ local function ActivateShield(Player)
 	resetcooldowntimers:defaultAccess(ULib.ACCESS_SUPERADMIN)
 	resetcooldowntimers:help("Reset shield cooldown timers.")
 
+<<<<<<< HEAD
 	function ulx.disableshield(Admin, Player)
 		UpdateCooldownDB()
 		CSay(Player, "Your shield has been removed.", red)
 		Player:GodDisable()
 	end
+=======
+function ulx.forfeitshield(Player)
+	UpdateCooldownDB()
+	CSay(Player, "You have forfeited your shield and my not reactivate it for 45 minutes.", red)
+	SetCooldown(Player)
+	Player:GodDisable()
+end
+
+local forfeitshield = ulx.command(CATEGORY_NAME, "ulx forfeitshield", ulx.forfeitshield, "!forfeitshield")
+forfeitshield:defaultAccess(ULib.ACCESS_ALL)
+forfeitshield:help("Forfeits your shield.")
+
+function ulx.removecooldown(Admin, Player)
+	UpdateCooldownDB()
+	CSay(Player, "Your shield cooldown timer has been zeroed.", red)
+	SetCooldown(Player, true)
+end
+>>>>>>> refs/remotes/origin/debug
 
 	local disableshield = ulx.command(CATEGORY_NAME, "ulx disableshield", ulx.disableshield, "!disableshield")
 	disableshield:defaultAccess(ULib.ACCESS_SUPERADMIN)
@@ -180,6 +199,18 @@ local function ActivateShield(Player)
 			SetCooldown(Killer, false)
 			end
 		end
+<<<<<<< HEAD
+=======
+	elseif Killer:GetOwner():IsPlayer() and Killer:GetOwner():HasGodMode() then
+		if Killer ~= Victim then
+			local msg = Killer:Nick().."'s shield has been revoked for killing "..Victim:Nick().." and may not be activated again for 45 minutes."
+			CSay(nil, msg, red)
+			Killer:GodDisable()
+			SetCooldown(Killer, false)
+		end
+	end
+end
+>>>>>>> refs/remotes/origin/debug
 
 	local function Spawn(Player)
 		UpdateCooldownDB()
