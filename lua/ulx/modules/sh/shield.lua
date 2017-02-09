@@ -4,7 +4,10 @@
 CATEGORY_NAME = "Shield"
 ShieldCooldownDB = {}
 SpawnProtectedDB = {}
-
+-- These can be changed to your liking if the convars don't work.
+InitialSpawnCooldownTime = 120 -- Initial spawn cooldown time in seconds.
+SubsequentCooldownTime = 20 -- Cooldown time for each subsequent spawn after the first, in seconds.
+CooldownTime = 45 -- Cooldown for each loss of shield in minutes.
 -- Colors
 local yellow = Color(255, 255, 0)
 local cyan = Color(0, 255, 255)
@@ -128,7 +131,7 @@ local function ActivateShield(Player)
 
 	function ulx.forfeitshield(Player)
 		UpdateCooldownDB()
-		CSay(Player, "You have forfeited your shield and my not reactivate it for " .. CooldownTime:GetString() .. " minutes.", red)
+		CSay(Player, "You have forfeited your shield and may not reactivate it for " .. CooldownTime .. " minutes.", red)
 		SetCooldown(Player)
 		Player:GodDisable()
 	end
@@ -207,7 +210,7 @@ local function ActivateShield(Player)
 		UpdateCooldownDB()
 
 		if Player:Deaths() ~= 0 then
-			CSay(Player, "You are protected for " .. SubsequentCooldownTime:GetString() .. " seconds or until you attack someone.", green)
+			CSay(Player, "You are protected for " .. SubsequentCooldownTime .. " seconds or until you attack someone.", green)
 			SpawnProtectedDB[Player:Nick()] = true
 			Player:GodEnable()
 
@@ -215,12 +218,7 @@ local function ActivateShield(Player)
 				ExpireProtection(Player)
 			end)
 		else
-			if InitialSpawnCooldownTime:GetInt() >= 60 then
-				local cotom = InitialSpawnCooldownTime:GetInt() / 60
-				CSay(Player, "You are protected for " .. cotom .. " minutes or until you attack someone.", green)
-			else
-				CSay(Player, "You are protected for " .. InitialSpawnCooldownTime:GetString() .. " seconds or until you attack someone.", green)
-			end
+			CSay(Player, "You are protected for " .. InitialSpawnCooldownTime .. " minutes or until you attack someone.", green)
 
 			SpawnProtectedDB[Player:Nick()] = true
 			Player:GodEnable()
@@ -249,10 +247,3 @@ local function ActivateShield(Player)
 	hook.Add("PlayerDeath", "ShieldMod_DEATH", Killed)
 	hook.Add("PlayerSpawn", "ShieldMod_SPAWN", Spawn)
 	hook.Add("PlayerHurt", "ShieldMod_HURT", Damaged)
-
-	-- Init Convars
-	if SERVER then
-		CooldownTime = ulx.convar("sm_cooltime", "45", "Cooldown for each loss of shield in minutes", ULib.ACCESS_SUPERADMIN)
-		SubsequentCooldownTime = ulx.convar("sm_initcooltime", "120", "Initial spawn cooldown time in seconds", ULib.ACCESS_SUPERADMIN)
-		CooldownTime = ulx.convar("sm_spawncooltime", "20", "Cooldown time for each subsequent spawn after the first, in seconds", ULib.ACCESS_SUPERADMIN)
-	end
