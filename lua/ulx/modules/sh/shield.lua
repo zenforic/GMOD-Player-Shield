@@ -1,19 +1,9 @@
 -----[    Player Shield Mod Version 1.3a    ]-----
 
--- Init Convars
-if SERVER then
-	ulx.convar("sm_cooltime", "45", "Cooldown for each loss of shield in minutes", ULib.ACCESS_SUPERADMIN)
-	ulx.convar("sm_initcooltime", "120", "Initial spawn cooldown time in seconds", ULib.ACCESS_SUPERADMIN)
-	ulx.convar("sm_spawncooltime", "20", "Cooldown time for each subsequent spawn after the first, in seconds", ULib.ACCESS_SUPERADMIN)
-end
-
 -- Variables
 CATEGORY_NAME = "Shield"
 ShieldCooldownDB = {}
 SpawnProtectedDB = {}
-InitialSpawnCooldownTime = GetConVar("sm_initcooltime")
-SubsequentCooldownTime = GetConVar("sm_spawncooltime")
-CooldownTime = GetConVar("sm_cooltime")
 
 -- Colors
 local yellow = Color(255, 255, 0)
@@ -259,3 +249,10 @@ local function ActivateShield(Player)
 	hook.Add("PlayerDeath", "ShieldMod_DEATH", Killed)
 	hook.Add("PlayerSpawn", "ShieldMod_SPAWN", Spawn)
 	hook.Add("PlayerHurt", "ShieldMod_HURT", Damaged)
+
+	-- Init Convars
+	if SERVER then
+		CooldownTime = ulx.convar("sm_cooltime", "45", "Cooldown for each loss of shield in minutes", ULib.ACCESS_SUPERADMIN)
+		SubsequentCooldownTime = ulx.convar("sm_initcooltime", "120", "Initial spawn cooldown time in seconds", ULib.ACCESS_SUPERADMIN)
+		CooldownTime = ulx.convar("sm_spawncooltime", "20", "Cooldown time for each subsequent spawn after the first, in seconds", ULib.ACCESS_SUPERADMIN)
+	end
