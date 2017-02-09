@@ -13,6 +13,7 @@ else
 	InitialSpawnCooldownTime = 120
 	SubsequentCooldownTime = 20
 	CooldownTime = 45
+end
 -- Colors
 local yellow = Color(255, 255, 0)
 local cyan = Color(0, 255, 255)
