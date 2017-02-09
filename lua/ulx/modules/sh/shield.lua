@@ -11,9 +11,9 @@ end
 CATEGORY_NAME = "Shield"
 ShieldCooldownDB = {}
 SpawnProtectedDB = {}
-local InitialSpawnCooldownTime = GetConVar("sm_initcooltime")
-local SubsequentCooldownTime = GetConVar("sm_spawncooltime")
-local CooldownTime = GetConVar("sm_cooltime")
+InitialSpawnCooldownTime = GetConVar("sm_initcooltime")
+SubsequentCooldownTime = GetConVar("sm_spawncooltime")
+CooldownTime = GetConVar("sm_cooltime")
 
 -- Colors
 local yellow = Color(255, 255, 0)
