@@ -137,7 +137,7 @@ local function ActivateShield(Player)
 
 	function ulx.forfeitshield(Player)
 		UpdateCooldownDB()
-		CSay(Player, "You have forfeited your shield and my not reactivate it for " .. CooldownTime:GetString() .. " minutes.", red)
+		CSay(Player, "You have forfeited your shield and my not reactivate it for " .. CooldownTime:GetInt() .. " minutes.", red)
 		SetCooldown(Player)
 		Player:GodDisable()
 	end
@@ -216,7 +216,7 @@ local function ActivateShield(Player)
 		UpdateCooldownDB()
 
 		if Player:Deaths() ~= 0 then
-			CSay(Player, "You are protected for " .. SubsequentCooldownTime:GetString() .. " seconds or until you attack someone.", green)
+			CSay(Player, "You are protected for " .. SubsequentCooldownTime:GetInt() .. " seconds or until you attack someone.", green)
 			SpawnProtectedDB[Player:Nick()] = true
 			Player:GodEnable()
 
@@ -228,7 +228,7 @@ local function ActivateShield(Player)
 				local cotom = InitialSpawnCooldownTime:GetInt() / 60
 				CSay(Player, "You are protected for " .. cotom .. " minutes or until you attack someone.", green)
 			else
-				CSay(Player, "You are protected for " .. InitialSpawnCooldownTime:GetString() .. " seconds or until you attack someone.", green)
+				CSay(Player, "You are protected for " .. InitialSpawnCooldownTime:GetInt() .. " seconds or until you attack someone.", green)
 			end
 
 			SpawnProtectedDB[Player:Nick()] = true
