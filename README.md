@@ -5,8 +5,9 @@ Player Shield Mod is a server-side addon for GMod providing anti-griefing featur
 
 **Features:**
 
-- 120-second default modifiable Initial spawn kill protection
-- 60-second default modifiable Spawn kill protection
+- 120-second default modifiable Initial spawn kill protection (configure on variables section)
+- 60-second default modifiable Spawn kill protection (configure on variables section)
+- 45-minute default modifiable Shield loss cooldown (configure on variables section)
 - "Peace" mode
 
 **Dependencies:**
@@ -22,12 +23,7 @@ Peace mode may be activated by sending `!shield` or `!neutral` in chat, disabled
 The spawn kill protection works similar to the "peace" mode, but rather than when they kill a player it is stripped when they harm a player.
 
 **To-do:**
-- Nothing Yet. Open to suggestions.
-
-**CVars:**
-- `sm_initcooldown int` - Initial spawn cooldown time in seconds.
-- `sm_cooltime int` - Cooldown for each loss of shield in minutes.
-- `sm_spawncooltime int` - Cooldown time for each subsequent spawn after the first, in seconds.
+- Add modifiable CVars for cooldown.
 
 **Admin Commands:**
 - `!disableshield player` - Revoke shield from the given player.
