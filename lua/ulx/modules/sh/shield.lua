@@ -192,13 +192,13 @@ local function ActivateShield(Player)
 		end
 
 		if Killer:IsPlayer() and Killer:HasGodMode() and Killer ~= Victim then
-			local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetString() .. " minutes."
+			local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetInt() .. " minutes."
 			CSay(nil, msg, red)
 			Killer:GodDisable()
 			SetCooldown(Killer, false)
 		elseif Killer:GetOwner():IsPlayer() and Killer:GetOwner():HasGodMode() then
 			if Killer ~= Victim then
-				local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetString() .. " minutes."
+				local msg = Killer:Nick() .. "'s shield has been revoked for killing " .. Victim:Nick() .. " and may not be activated again for " .. CooldownTime:GetInt() .. " minutes."
 				CSay(nil, msg, red)
 				Killer:GodDisable()
 				SetCooldown(Killer, false)
